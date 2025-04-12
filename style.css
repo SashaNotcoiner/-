@@ -1,0 +1,219 @@
+/* style.css */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    /* overflow: hidden; */ /* Можно убрать, если контент может выходить за рамки */
+    background-color: #000; /* Фон на случай, если картинка не загрузится */
+    color: white; /* Основной цвет текста */
+    overscroll-behavior-y: contain; /* Предотвращает "оттягивание" страницы на мобильных */
+}
+
+.page {
+    display: none; /* Скрыты по умолчанию */
+    position: relative; 
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow-y: auto; /* Добавляем скролл, если контент не помещается */
+    -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
+}
+
+#time-page::after {
+    content: ""; /* Обязательно для псевдо-элементов */
+    position: absolute;
+    bottom: 0; /* Располагаем внизу */
+    left: 0;
+    width: 100%;
+    height: 40%; /* Высота градиента - подберите значение */
+    /* Градиент: от прозрачного сверху к цвету фона снизу */
+    /* Замените #1C1C1E на точный цвет фона под навигацией, если он другой */
+    background: linear-gradient(to bottom,
+        rgba(28, 28, 30, 0) 0%,  /* Полностью прозрачный в начале градиента */
+        rgb(0, 0, 0) 80%, /* Начинаем делать непрозрачным */
+        #1C1C1E 100% /* Полностью непрозрачный цвет фона в конце */
+    );
+    pointer-events: none; /* Позволяет кликать сквозь оверлей */
+    z-index: 1; /* Убедитесь, что он над картинкой, но под кнопками, если нужно */
+}
+
+.page.active {
+    display: block !important; /* Показываем активную страницу */
+}
+
+.page-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1; /* Картинка на заднем плане */
+    -webkit-user-select: none;
+    user-select: none; /* Запрет выделения картинки */
+    -webkit-user-drag: none; /* Запрет перетаскивания */
+}
+
+#countdown {
+    position: absolute;
+    top: 10vh; /* Используем vh для относительного позиционирования */
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    text-shadow: 3px 3px 5px rgba(0,0,0,0.8);
+    font-size: clamp(2.5em, 8vw, 5em); /* Адаптивный размер шрифта */
+    font-weight: 900;
+    white-space: nowrap;
+    display: flex;
+    gap: clamp(10px, 4vw, 25px); /* Адаптивный отступ */
+    -webkit-user-select: none;
+    user-select: none;
+}
+#countdown > div { /* Стили для цифр таймера */
+    min-width: 1.5em;
+    text-align: center;
+}
+
+
+.referral-container {
+    position: absolute;
+    top: 19%; /* Центрируем вертикально */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 90%; /* Шире на мобильных */
+    max-width: 600px; /* Ограничение макс. ширины */
+    padding: 20px;
+    box-sizing: border-box;
+    border-radius: 10px;
+}
+
+.referral-container h2 {
+    font-size: clamp(1.8em, 5vw, 2.5em);
+    margin-bottom: 20px; /* Уменьшен отступ */
+    color: white; /* Указываем цвет явно */
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+}
+
+.copy-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0;
+    gap: 8px;
+}
+
+#referral-link {
+    border: 1px solid #ccc; /* Менее резкая граница */
+    border-radius: 8px;
+    padding: 10px 15px; /* Немного другие отступы */
+    /* width: 70%; */ /* Ширина будет зависеть от flex */
+    flex-grow: 1; /* Занимает доступное место */
+    min-width: 0; /* Важно для flex */
+    height: 46px;
+    font-size: clamp(0.9em, 3vw, 1em);
+    background: rgba(255, 255, 255, 0.9);
+    color: #333; /* Цвет текста в поле */
+    overflow: hidden; /* Скрываем выходящий текст */
+    text-overflow: ellipsis; /* Многоточие для длинных ссылок */
+    white-space: nowrap;
+}
+
+.copy-btn {
+    background: rgba(255, 255, 255, 0.8); /* Фон кнопки копирования */
+    border: none;
+    width: 46px; /* Размер кнопки */
+    height: 46px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0; /* Не сжиматься */
+    padding: 0; /* Убрать внутренние отступы */
+}
+.copy-btn:hover {
+    background-color: rgba(255, 255, 255, 1);
+    transform: scale(1.05);
+}
+.copy-btn:active {
+    transform: scale(0.95);
+}
+
+.copy-btn img {
+    width: 60%; /* Размер иконки внутри кнопки */
+    height: 60%;
+    object-fit: contain; /* Используем contain, чтобы иконка влезла */
+    filter: none !important;
+}
+.copy-status {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #90ee90; /* Светло-зеленый для успеха */
+    height: 1.2em; /* Резервируем место */
+    font-weight: bold;
+}
+
+
+.referral-container p {
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+    margin: 10px 0;
+    font-size: clamp(1em, 3.5vw, 1.2em);
+}
+#referral-count {
+    font-weight: bold;
+}
+
+/* Нижняя навигация */
+.bottom-nav {
+    position: fixed; /* Фиксируем внизу */
+    bottom: 0;
+    left: 0; /* Растягиваем на всю ширину */
+    right: 0;
+    display: flex;
+    justify-content: space-around; /* Распределяем кнопки */
+    align-items: center;
+    padding: 5px 0 10px 0; /* Отступы */
+    background: rgba(0, 0, 0, 0.5); /* Полупрозрачный фон */
+    backdrop-filter: blur(5px); /* Размытие фона (если поддерживается) */
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 100; /* Поверх всего */
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-btn {
+    /* Убрали фиксированные размеры, пусть подстраиваются */
+    /* width: 240px; */
+    /* height: 118px; */
+    max-width: 30%; /* Ограничиваем ширину кнопки */
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    opacity: 0.4; /* Неактивные кнопки полупрозрачные */
+}
+.nav-btn.active {
+    opacity: 1.0; /* Активная кнопка непрозрачная */
+    /* Можно добавить стиль для активной кнопки, например, фон */
+    /* background-color: rgba(255, 255, 255, 0.1); */
+}
+
+.nav-btn img {
+    display: block; /* Убирает лишний отступ снизу */
+    width: 100%;
+    max-height: 70px; /* Ограничиваем высоту иконки */
+    object-fit: contain;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+/* Убираем абсолютное позиционирование из медиа-запроса, т.к. элементы уже адаптивны */
+/* @media (max-width: 768px) {
+    ... (можно оставить, если нужна доп. логика) ...
+} */

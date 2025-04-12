@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Countdown App</title>
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body data-bot-username="dmitrebot">  <!-- <<< ЗАМЕНИТЕ НА USERNAME ВАШЕГО БОТА БЕЗ @ -->
+    <!-- Страница таймера -->
+    <div id="time-page" class="page active">
+        <img src="static/images/Group 53.png" class="page-image" alt="Background Time">
+        <div id="countdown">Загрузка...</div>
+    </div>
+
+    <!-- Реферальная страница -->
+    <div id="referral-page" class="page">
+        <img src="static/images/Group 52.png" class="page-image" alt="Background Referral">
+        <div class="referral-container">
+            <div class="copy-container">
+                <input type="text" id="referral-link" readonly placeholder="Генерация ссылки...">
+                <button id="copy-button" class="copy-btn" title="Копировать ссылку"> <!-- Добавлен ID и title -->
+                    <img src="static/images/photo_2025-04-01_19-11-07.jpg" alt="Копировать"> <!-- Ваша иконка -->
+                </button>
+            </div>
+            <p>Приглашено: <span id="referral-count">0</span></p> <!-- Счетчик рефералов (пока статичный) -->
+            <p id="copy-status" class="copy-status"></p> <!-- Статус копирования -->
+        </div>
+    </div>
+
+    <!-- Страница квестов -->
+    <div id="quests-page" class="page">
+        <img src="static/images/Group 55 (1).png" class="page-image" alt="Background Quests">
+        <div class="container">
+             <h2 style="position:absolute; top: 100px; left: 50%; transform: translateX(-50%); color: white; text-shadow: 1px 1px 2px black;">Квесты</h2>
+        </div>
+    </div>
+
+    <!-- Общая нижняя навигация -->
+    <nav class="bottom-nav">
+        <button class="nav-btn" data-page="referral">
+            <img src="static/images/Group 32.png" alt="Рефералы">
+        </button>
+        <button class="nav-btn active" data-page="time">
+            <img src="static/images/Group 23.png" alt="Время">
+        </button>
+        <button class="nav-btn" data-page="quests">
+            <img src="static/images/Group 33.png" alt="Квесты">
+        </button>
+    </nav>
+
+    <!-- Подключаем наш скрипт в конце body -->
+    <script src="static/script.js" defer></script>
+</body>
+</html>
