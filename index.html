@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Telegram Countdown App</title>
+    <style>
+        /* Добавленные стили для прелоадера */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('Group 54.png') center/cover no-repeat; /* ЗАМЕНИТЕ ЭТУ ССЫЛКУ */
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        .page {
+            display: none;
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .page.active {
+            display: block !important;
+        }
+
+        .page-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        #countdown {
+            position: absolute;
+            top: 210px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white !important;
+            text-shadow: 3px 3px 5px rgba(0,0,0,0.8);
+            font-size: 5em;
+            font-weight: 900;
+            white-space: nowrap;
+            display: flex;
+            gap: 25px;
+        }
+
+        .referral-container {
+            position: absolute;
+            top: 370px;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 80%;
+        }
+
+        .referral-container h2 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .copy-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 8px;
+        }
+
+        #referral-link {
+            border: 2px solid #000;
+            border-radius: 5px;
+            padding: 12px 15px;
+            width: 60%;
+            height: 46px;
+            font-size: 1em;
+            background: rgba(255,255,255,0.9);
+        }
+
+        .copy-btn {
+            background: #1111;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-btn:hover {
+            background: #1111;
+            transform: scale(1.05);
+        }
+
+        .copy-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: none !important;
+            transition: transform 0.3s;
+        }
+
+        .copy-btn:hover img {
+            transform: scale(0);
+        }
+
+        .referral-container p {
+            color:  black;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.0);
+            margin: 10px 0;
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            padding: 10px;
+            z-index: 2;
+        }
+
+        .nav-btn {
+            width: 288px;
+            height: 306px;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        .nav-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        @media (max-width: 768px) {
+            .page, .page-image, #countdown, .referral-container, .bottom-nav {
+                transform: none !important;
+                left: 0 !important;
+                width: 100% !important;
+            }
+        }
+    </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+</head>
+<body>
+    <!-- Экран загрузки -->
+    <div class="loading-screen"></div>
+
+    <!-- Страница таймера -->
+    <div id="time-page" class="page active">
+        <img src="Group 53.png" class="page-image">
+        <div id="countdown">Загрузка...</div>
+        <nav class="bottom-nav">
+            <button class="nav-btn active" onclick="showPage('referral')">
+                <img src="Group 26.png" alt="Рефералы">
+            </button>
+            <button class="nav-btn" onclick="showPage('time')">
+                <img src="Group 13.png" alt="Время">
+            </button>
+            <button class="nav-btn" onclick="showPage('quests')">
+                <img src="Group 27.png" alt="Квесты">
+            </button>
+        </nav>
+    </div>
+
+    <!-- Реферальная страница -->
+    <div id="referral-page" class="page">
+        <img src="Group 52.png" class="page-image">
+        <div class="referral-container">
+            <h2></h2>
+            <div class="copy-container">
+                <input type="text" id="referral-link" readonly>
+                <button class="copy-btn" onclick="copyToClipboard()">
+                    <img src="photo_2025-04-01_19-11-07.jpg" alt="Копировать">
+                </button>
+            </div>
+            <p>Приглашено: <span id="referral-count">0</span></p>
+        </div>
+        <nav class="bottom-nav">
+            <button class="nav-btn" onclick="showPage('referral')">
+                <img src="Group 32.png" alt="Рефералы">
+            </button>
+            <button class="nav-btn active" onclick="showPage('time')">
+                <img src="Group 23.png" alt="Время">
+            </button>
+            <button class="nav-btn" onclick="showPage('quests')">
+                <img src="Group 27.png" alt="Квесты">
+            </button>
+        </nav>
+    </div>
+
+    <!-- Страница квестов -->
+    <div id="quests-page" class="page">
+        <img src="Group 55 (1).png" class="page-image">
+        <div class="container"></div>
+        <nav class="bottom-nav">
+            <button class="nav-btn" onclick="showPage('referral')">
+                <img src="Group 26.png" alt="Рефералы">
+            </button>
+            <button class="nav-btn" onclick="showPage('time')">
+                <img src="Group 23.png" alt="Время">
+            </button>
+            <button class="nav-btn active" onclick="showPage('quests')">
+                <img src="Group 33.png" alt="Квесты">
+            </button>
+        </nav>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // Добавленная логика прелоадера
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingScreen = document.querySelector('.loading-screen');
+            let dataLoaded = false;
+            let minTimeElapsed = false;
+
+            setTimeout(() => {
+                minTimeElapsed = true;
+                checkLoading();
+            }, 1000);
+
+            function checkLoading() {
+                if(dataLoaded && minTimeElapsed) {
+                    loadingScreen.classList.add('hidden');
+                }
+            }
+
+            function initApp() {
+                setInterval(updateTimer, 1000);
+                if(tg.initDataUnsafe.user) {
+                    db.collection('users').doc(tg.initDataUnsafe.user.id).set({
+                        referrals: 0,
+                        created: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true }).then(() => {
+                        initReferrals();
+                        dataLoaded = true;
+                        checkLoading();
+                    });
+                } else {
+                    dataLoaded = true;
+                    checkLoading();
+                }
+            }
+
+            initApp();
+        });
+
+        // Оригинальные функции
+        function showPage(page) {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+                const img = btn.querySelector('img');
+                img.src = img.src.replace('_active', '_inactive');
+            });
+
+            document.querySelectorAll(`[onclick="showPage('${page}')"]`).forEach(btn => {
+                btn.classList.add('active');
+                const img = btn.querySelector('img');
+                img.src = img.src.replace('_inactive', '_active');
+            });
+
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(`${page}-page`).classList.add('active');
+        }
+
+        function updateTimer() {
+            const targetDate = new Date('2025-04-03T12:00:00').getTime();
+            const now = new Date().getTime();
+            const diff = targetDate - now;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('countdown').innerHTML = `
+                <div>${days}</div>
+                <div>${hours}</div>
+                <div>${minutes}</div>
+                <div>${seconds}</div>
+            `;
+        }
+
+        function copyToClipboard() {
+            const link = document.getElementById('referral-link');
+            link.select();
+            document.execCommand('copy');
+            
+            const btn = document.querySelector('.copy-btn');
+            btn.style.background = '#28a745';
+            setTimeout(() => {
+                btn.style.background = '#007bff';
+            }, 1000);
+        }
+
+        function initReferrals() {
+            const userId = tg.initDataUnsafe.user?.id;
+            const referrerId = tg.initDataUnsafe.start_param;
+            
+            if(referrerId && referrerId !== userId) {
+                db.collection('users').doc(referrerId).update({
+                    referrals: firebase.firestore.FieldValue.increment(1)
+                });
+            }
+
+            const referralLink = `https://t.me/${tg.initDataUnsafe.user?.username}?start=${userId}`;
+            document.getElementById('referral-link').value = referralLink;
+
+            db.collection('users').doc(userId).onSnapshot(doc => {
+                document.getElementById('referral-count').textContent = doc.data()?.referrals || 0;
+            });
+        }
+    </script>
+</body>
+</html>
